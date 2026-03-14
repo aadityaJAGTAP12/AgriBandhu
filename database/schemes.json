@@ -1,0 +1,16 @@
+[
+  {
+    "id": "scheme_001",
+    "name": "PM-KISAN",
+    "description": "Pradhan Mantri Kisan Samman Nidhi provides income support to all landholding farmers' families.",
+    "benefit": "₹6000 per year",
+    "eligibility": ["Small and marginal farmers", "Own cultivable land"]
+  },
+  {
+    "id": "scheme_002",
+    "name": "PMFBY",
+    "description": "Pradhan Mantri Fasal Bima Yojana offers crop insurance against natural calamities, pests, and diseases.",
+    "benefit": "Crop insurance cover",
+    "eligibility": ["All farmers growing notified crops in notified areas"]
+  }
+]

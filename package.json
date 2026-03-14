@@ -1,0 +1,18 @@
+{
+  "name": "agribandhu",
+  "version": "1.0.0",
+  "description": "Agri Bandhu - AI-powered farming assistant",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "^9.3.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}

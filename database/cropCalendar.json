@@ -1,0 +1,37 @@
+{
+  "rice": {
+    "season": "kharif",
+    "duration_days": 120,
+    "schedule": [
+      { "week": 1, "task": "Land preparation" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 3, "task": "Irrigation management" },
+      { "week": 4, "task": "Weed removal" },
+      { "week": 6, "task": "Pest monitoring" },
+      { "week": 12, "task": "Harvest preparation" }
+    ]
+  },
+  "wheat": {
+    "season": "rabi",
+    "duration_days": 110,
+    "schedule": [
+      { "week": 1, "task": "Field preparation" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 4, "task": "Fertilizer application" },
+      { "week": 8, "task": "Pest monitoring" },
+      { "week": 16, "task": "Harvest" }
+    ]
+  },
+  "cotton": {
+    "season": "kharif",
+    "duration_days": 150,
+    "schedule": [
+      { "week": 1, "task": "Deep ploughing" },
+      { "week": 2, "task": "Seed sowing with proper spacing" },
+      { "week": 4, "task": "First weeding and hoeing" },
+      { "week": 6, "task": "Fertilizer application (Nitrogen)" },
+      { "week": 8, "task": "Pest monitoring (Bollworm)" },
+      { "week": 20, "task": "First picking" }
+    ]
+  }
+}

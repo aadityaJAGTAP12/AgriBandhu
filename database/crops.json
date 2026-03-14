@@ -1,0 +1,24 @@
+[
+  {
+    "id": "wheat",
+    "name": "Wheat",
+    "diseases": [
+      {
+        "name": "Rust",
+        "symptoms": ["yellow spots", "orange powder"],
+        "treatment": "Apply appropriate fungicide and ensure good field drainage."
+      }
+    ]
+  },
+  {
+    "id": "rice",
+    "name": "Rice",
+    "diseases": [
+      {
+        "name": "Blast",
+        "symptoms": ["diamond shaped spots", "grey center"],
+        "treatment": "Use resistant varieties, apply tricyclazole."
+      }
+    ]
+  }
+]
