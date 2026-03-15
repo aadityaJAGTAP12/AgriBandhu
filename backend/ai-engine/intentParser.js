@@ -1,26 +1,12 @@
 /**
- * Simple keyword-based intent parser.
- * A real version would use NLP like Dialogflow, Rasa, or an LLM.
+ * DEPRECATED: This module is no longer used in the new LLM Agent architecture.
+ * The system now uses natural language processing through the LLM Agent directly.
+ * This file is kept for reference only.
  */
-const detectIntent = (message) => {
-  const text = message.toLowerCase();
-  
-  if (text.includes("weather") || text.includes("rain") || text.includes("temperature")) {
-    return "weather";
-  }
-  
-  if (text.includes("scheme") || text.includes("subsidy") || text.includes("government") || text.includes("pm")) {
-    return "government_scheme";
-  }
-  
-  if (text.includes("disease") || text.includes("sick") || text.includes("spot") || text.includes("yellow")) {
-    return "disease_detection";
-  }
-  
-  if (text.includes("advice") || text.includes("how to") || text.includes("help")) {
-    return "crop_advisory";
-  }
 
+// This function is no longer called
+const detectIntent = (message) => {
+  console.warn('intentParser.js is deprecated. Using LLM Agent instead.');
   return "unknown";
 };
 

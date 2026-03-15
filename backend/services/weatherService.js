@@ -2,7 +2,7 @@ const axios = require('axios');
 const apiKeys = require('../config/apiKeys');
 
 /**
- * Fetches real weather data from OpenWeather API.
+ * Weather service for Agri Bandhu - Tool interface
  */
 const getWeather = async (location = "Delhi") => {
   try {
@@ -10,11 +10,11 @@ const getWeather = async (location = "Delhi") => {
     if (!key || key === "YOUR_OPENWEATHER_API_KEY_HERE" || key === "dummy_weather_key") {
       console.log("⚠️ Using mock weather data (API Key missing).");
       return {
-        location,
-        temp: 32, // Celsius
-        description: "Clear sky",
+        city: location,
+        temperature: 32,
         humidity: 60,
-        rainfall: 0
+        rainfall: 0,
+        condition: "Clear sky"
       };
     }
 
@@ -30,23 +30,27 @@ const getWeather = async (location = "Delhi") => {
     const rainfall = data.rain && data.rain['1h'] ? data.rain['1h'] : 0;
 
     return {
-      location: data.name,
-      temp: data.main.temp,
-      description: data.weather[0].description,
+      city: data.name,
+      temperature: Math.round(data.main.temp),
       humidity: data.main.humidity,
-      rainfall: rainfall
+      rainfall: rainfall,
+      condition: data.weather[0].description
     };
   } catch (error) {
     console.error("OpenWeather API Error:", error.message);
     // Fallback on error
     return {
-      location,
-      temp: 32,
-      description: "Clear sky",
+      city: location,
+      temperature: 32,
       humidity: 60,
-      rainfall: 0
+      rainfall: 0,
+      condition: "Clear sky"
     };
   }
+};
+
+module.exports = {
+  getWeather
 };
 
 module.exports = {

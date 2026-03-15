@@ -1,0 +1,120 @@
+Pest Control Guidelines for Indian Agriculture
+
+Integrated Pest Management (IPM) is essential for sustainable agriculture and environmental protection.
+
+INTEGRATED PEST MANAGEMENT (IPM)
+
+PRINCIPLES OF IPM
+- Prevention through resistant varieties and crop rotation
+- Monitoring pest populations and damage
+- Economic threshold determination
+- Biological control methods
+- Chemical control as last resort
+- Regular evaluation of pest management practices
+
+PEST MONITORING
+- Regular field scouting (weekly during critical stages)
+- Use of pheromone traps for insect pests
+- Yellow/blue sticky traps for monitoring
+- Light traps for nocturnal insects
+- Economic threshold levels (ETL) for decision making
+
+BIOLOGICAL CONTROL
+- Natural enemies: Ladybird beetles, spiders, predatory mites
+- Parasitic wasps and flies
+- Entomopathogenic fungi and bacteria
+- Bacillus thuringiensis (Bt) for caterpillar pests
+- Trichoderma for fungal diseases
+
+CULTURAL CONTROL
+- Crop rotation to break pest cycles
+- Proper field sanitation and residue management
+- Optimum plant spacing for air circulation
+- Timely sowing and harvesting
+- Resistant/tolerant varieties
+
+MECHANICAL CONTROL
+- Hand picking of large insects
+- Use of light traps and pheromone traps
+- Bird perches for insect control
+- Row covers and netting
+- Soil solarization
+
+CHEMICAL CONTROL
+
+INSECTICIDES
+- Systemic insecticides: Imidacloprid, Thiamethoxam
+- Contact insecticides: Cypermethrin, Lambda cyhalothrin
+- Stomach poisons: Carbaryl, Malathion
+- Selective insecticides: Spinosad, Neem oil
+
+FUNGICIDES
+- Contact fungicides: Copper oxychloride, Mancozeb
+- Systemic fungicides: Carbendazim, Hexaconazole
+- Preventive fungicides: Bordeaux mixture
+- Biofungicides: Trichoderma, Pseudomonas
+
+ACARICIDES
+- Sulfur-based: Wettable sulfur
+- Organophosphates: Dimethoate
+- Modern: Abamectin, Fenazaquin
+
+PEST MANAGEMENT BY CROP
+
+RICE
+- Stem borer: Release Trichogramma wasps, apply cartap hydrochloride
+- Brown plant hopper: Use resistant varieties, apply buprofezin
+- Leaf folder: Neem oil sprays, release natural enemies
+- Blast disease: Use resistant varieties, apply tricyclazole
+
+WHEAT
+- Aphids: Release ladybird beetles, apply imidacloprid
+- Armyworm: Bacillus thuringiensis, chlorpyrifos
+- Rust diseases: Use resistant varieties, apply propiconazole
+- Loose smut: Seed treatment with carbendazim
+
+COTTON
+- Bollworm: Bt cotton varieties, NPV virus
+- Jassids: Apply imidacloprid or thiamethoxam
+- Whitefly: Release Encarsia wasps, neem oil
+- Bacterial blight: Copper-based fungicides
+
+MAIZE
+- Stem borer: Release Trichogramma, apply emamectin benzoate
+- Armyworm: Bt sprays, spinosad
+- Downy mildew: Metalaxyl + mancozeb
+- Rust: Propiconazole sprays
+
+SUGARCANE
+- Early shoot borer: Cartap hydrochloride
+- Top borer: Release Trichogramma chilonis
+- Pyrilla: Neem oil, azadirachtin
+- Red rot: Resistant varieties, hot water treatment of setts
+
+SAFETY PRECAUTIONS
+- Use personal protective equipment (PPE)
+- Follow label instructions and dosage
+- Avoid spraying during windy conditions
+- Respect waiting periods before harvest
+- Proper storage and disposal of pesticides
+
+RESISTANCE MANAGEMENT
+- Rotate different groups of pesticides
+- Use recommended doses only
+- Avoid frequent use of same pesticide
+- Combine chemical with biological control
+- Monitor for resistance development
+
+ENVIRONMENTAL CONSIDERATIONS
+- Avoid pesticide drift to water bodies
+- Protect beneficial insects and pollinators
+- Use selective pesticides
+- Promote organic farming practices
+- Follow integrated approaches
+
+TRAINING AND EXTENSION
+- Regular training programs for farmers
+- Demonstration plots for new technologies
+- Farmer field schools for IPM
+- Access to pest forecasting services
+- Government extension services

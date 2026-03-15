@@ -2,15 +2,71 @@
   {
     "id": "scheme_001",
     "name": "PM-KISAN",
-    "description": "Pradhan Mantri Kisan Samman Nidhi provides income support to all landholding farmers' families.",
-    "benefit": "₹6000 per year",
-    "eligibility": ["Small and marginal farmers", "Own cultivable land"]
+    "description": "Pradhan Mantri Kisan Samman Nidhi provides income support to all landholding farmers' families across India.",
+    "benefit": "₹6000 per year in three equal installments",
+    "eligibility": ["Small and marginal farmers", "Own cultivable land", "Farmers' families"]
   },
   {
     "id": "scheme_002",
     "name": "PMFBY",
-    "description": "Pradhan Mantri Fasal Bima Yojana offers crop insurance against natural calamities, pests, and diseases.",
-    "benefit": "Crop insurance cover",
-    "eligibility": ["All farmers growing notified crops in notified areas"]
+    "description": "Pradhan Mantri Fasal Bima Yojana offers comprehensive crop insurance against natural calamities, pests, and diseases.",
+    "benefit": "Crop loss compensation up to 100% of sum insured",
+    "eligibility": ["All farmers growing notified crops", "In notified areas", "Loanee and non-loanee farmers"]
+  },
+  {
+    "id": "scheme_003",
+    "name": "Soil Health Card Scheme",
+    "description": "Provides soil health cards to farmers which carry crop-wise recommendations of nutrients and fertilizers required for the individual farms.",
+    "benefit": "Free soil testing and fertilizer recommendations",
+    "eligibility": ["All farmers", "Farmers with cultivable land"]
+  },
+  {
+    "id": "scheme_004",
+    "name": "Kisan Credit Card",
+    "description": "Provides adequate and timely credit support from the banking system to farmers for their cultivation and other needs.",
+    "benefit": "Credit up to ₹3 lakh with low interest rates",
+    "eligibility": ["Farmers with good credit history", "Joint liability groups", "Self-help groups"]
+  },
+  {
+    "id": "scheme_005",
+    "name": "National Agriculture Market (eNAM)",
+    "description": "An online trading platform for agricultural commodities to create a unified national market for agricultural commodities.",
+    "benefit": "Better price discovery and direct marketing",
+    "eligibility": ["All farmers", "Traders registered with mandis"]
+  },
+  {
+    "id": "scheme_006",
+    "name": "Pradhan Mantri Krishi Sinchayi Yojana (PMKSY)",
+    "description": "Focuses on creating sources for assured irrigation and also creating protective irrigation by harnessing rainwater.",
+    "benefit": "Subsidies for irrigation infrastructure",
+    "eligibility": ["Small and marginal farmers", "Farmers' cooperatives", "State governments"]
+  },
+  {
+    "id": "scheme_007",
+    "name": "National Mission on Oilseeds and Oil Palm (NMOOP)",
+    "description": "Aims to increase production of oilseeds and oil palm to reduce import dependence and ensure edible oil security.",
+    "benefit": "Subsidies for oilseed cultivation and processing",
+    "eligibility": ["Oilseed farmers", "Oil palm growers"]
+  },
+  {
+    "id": "scheme_008",
+    "name": "Rashtriya Krishi Vikas Yojana (RKVY)",
+    "description": "Aims at achieving 4% annual growth in agriculture through development of agriculture and its allied sectors.",
+    "benefit": "Financial assistance for various agricultural activities",
+    "eligibility": ["State governments", "Farmers' organizations", "Agri-entrepreneurs"]
+  },
+  {
+    "id": "scheme_009",
+    "name": "National Food Security Mission (NFSM)",
+    "description": "Aims to increase production of rice, wheat, pulses, coarse cereals and commercial crops through area expansion and productivity enhancement.",
+    "benefit": "Subsidies for seeds, fertilizers, and equipment",
+    "eligibility": ["Farmers growing NFSM crops", "In identified districts"]
+  },
+  {
+    "id": "scheme_010",
+    "name": "Paramparagat Krishi Vikas Yojana (PKVY)",
+    "description": "Promotes organic farming practices through adoption of organic village clusters and certification of organic products.",
+    "benefit": "Financial assistance for organic farming",
+    "eligibility": ["Farmers interested in organic farming", "Groups of 50 farmers minimum"]
   }
 ]

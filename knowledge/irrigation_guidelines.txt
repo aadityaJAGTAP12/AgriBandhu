@@ -1,0 +1,95 @@
+Irrigation Guidelines for Indian Agriculture
+
+Proper irrigation is crucial for optimal crop yields and water conservation in Indian agriculture.
+
+IRRIGATION METHODS
+
+SURFACE IRRIGATION
+- Flood irrigation: Simple but inefficient (60-70% efficiency)
+- Furrow irrigation: Better for row crops like maize, cotton
+- Basin irrigation: Suitable for orchards and sugarcane
+- Border irrigation: For close-growing crops like wheat
+
+SPRINKLER IRRIGATION
+- Efficiency: 70-80%
+- Suitable for all crops and soil types
+- Reduces water loss through evaporation
+- Uniform water distribution
+- Can apply fertilizers through fertigation
+
+DRIP IRRIGATION
+- Highest efficiency: 85-95%
+- Ideal for water-scarce areas
+- Precise water application to root zone
+- Reduces weed growth and soil erosion
+- Suitable for high-value crops
+
+IRRIGATION SCHEDULING
+
+CRITICAL GROWTH STAGES
+- Seed germination: Ensure adequate moisture
+- Vegetative growth: Regular irrigation
+- Flowering/Pollination: Critical, avoid stress
+- Grain filling/Maturation: Reduce irrigation gradually
+
+SOIL MOISTURE MONITORING
+- Use tensiometers or soil moisture sensors
+- Monitor soil moisture at 15-30 cm depth
+- Irrigate when soil moisture reaches 50% depletion
+- Consider crop water requirements and weather
+
+WATER REQUIREMENT CALCULATION
+- Reference evapotranspiration (ET0) from weather data
+- Crop coefficient (Kc) for different growth stages
+- Gross irrigation requirement = ET0 × Kc / Efficiency
+- Adjust for effective rainfall
+
+MONSOON IRRIGATION MANAGEMENT
+
+RAINFED AGRICULTURE
+- Supplemental irrigation during dry spells
+- Water harvesting structures: Farm ponds, check dams
+- Conservation furrows to capture runoff
+- Drought-resistant varieties for uncertain rainfall
+
+IRRIGATED AGRICULTURE
+- Protective irrigation during monsoon breaks
+- Avoid over-irrigation causing waterlogging
+- Monitor soil drainage
+- Apply fertilizers before heavy rains
+
+WATER CONSERVATION TECHNIQUES
+
+MULCHING
+- Organic mulch: Crop residues, straw
+- Plastic mulch: Reduces evaporation by 30-40%
+- Live mulch: Cover crops between rows
+
+SOIL MANAGEMENT
+- Deep tillage for better water infiltration
+- Organic matter addition improves water holding capacity
+- Avoid soil compaction
+- Maintain soil structure
+
+CROP MANAGEMENT
+- Optimum plant spacing for efficient water use
+- Weed control to reduce competition
+- Timely harvesting to avoid water waste
+
+PRECISION IRRIGATION
+- Use of soil moisture sensors
+- Weather-based irrigation scheduling
+- Variable rate irrigation based on field variability
+- Automation for efficient water use
+
+WATER QUALITY CONSIDERATIONS
+- Salinity management: Leaching requirements
+- pH adjustment for alkaline waters
+- Filtration for drip systems
+- Regular water testing and treatment
+
+EFFICIENCY IMPROVEMENT
+- Regular maintenance of irrigation systems
+- Training farmers on efficient irrigation practices
+- Government subsidies for micro-irrigation
+- Water user associations for equitable distribution

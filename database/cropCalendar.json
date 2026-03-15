@@ -3,22 +3,27 @@
     "season": "kharif",
     "duration_days": 120,
     "schedule": [
-      { "week": 1, "task": "Land preparation" },
-      { "week": 2, "task": "Seed sowing" },
-      { "week": 3, "task": "Irrigation management" },
-      { "week": 4, "task": "Weed removal" },
-      { "week": 6, "task": "Pest monitoring" },
-      { "week": 12, "task": "Harvest preparation" }
+      { "week": 1, "task": "Land preparation and puddling" },
+      { "week": 2, "task": "Seed sowing/transplanting" },
+      { "week": 3, "task": "Early irrigation and weed control" },
+      { "week": 4, "task": "First fertilizer application" },
+      { "week": 6, "task": "Pest monitoring and control" },
+      { "week": 8, "task": "Second fertilizer application" },
+      { "week": 12, "task": "Final irrigation and harvest preparation" }
     ]
   },
   "wheat": {
     "season": "rabi",
     "duration_days": 110,
     "schedule": [
-      { "week": 1, "task": "Field preparation" },
+      { "week": 1, "task": "Field preparation and tilling" },
       { "week": 2, "task": "Seed sowing" },
-      { "week": 4, "task": "Fertilizer application" },
+      { "week": 3, "task": "Crown root initiation irrigation" },
+      { "week": 4, "task": "First fertilizer application" },
+      { "week": 6, "task": "Tillering stage irrigation" },
       { "week": 8, "task": "Pest monitoring" },
+      { "week": 10, "task": "Second fertilizer application" },
+      { "week": 14, "task": "Grain filling irrigation" },
       { "week": 16, "task": "Harvest" }
     ]
   },
@@ -26,12 +31,122 @@
     "season": "kharif",
     "duration_days": 150,
     "schedule": [
-      { "week": 1, "task": "Deep ploughing" },
+      { "week": 1, "task": "Deep ploughing and land preparation" },
       { "week": 2, "task": "Seed sowing with proper spacing" },
+      { "week": 3, "task": "Germination irrigation" },
       { "week": 4, "task": "First weeding and hoeing" },
       { "week": 6, "task": "Fertilizer application (Nitrogen)" },
       { "week": 8, "task": "Pest monitoring (Bollworm)" },
+      { "week": 10, "task": "Square formation irrigation" },
+      { "week": 12, "task": "Flowering irrigation" },
+      { "week": 16, "task": "Boll development" },
       { "week": 20, "task": "First picking" }
+    ]
+  },
+  "maize": {
+    "season": "kharif",
+    "duration_days": 90,
+    "schedule": [
+      { "week": 1, "task": "Land preparation" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 3, "task": "Knee-high irrigation" },
+      { "week": 4, "task": "First fertilizer application" },
+      { "week": 6, "task": "Weed control" },
+      { "week": 8, "task": "Tasseling irrigation" },
+      { "week": 10, "task": "Second fertilizer application" },
+      { "week": 12, "task": "Grain filling" },
+      { "week": 13, "task": "Harvest" }
+    ]
+  },
+  "sugarcane": {
+    "season": "autumn",
+    "duration_days": 540,
+    "schedule": [
+      { "week": 1, "task": "Land preparation and ridging" },
+      { "week": 2, "task": "Setts planting" },
+      { "week": 3, "task": "Germination irrigation" },
+      { "week": 4, "task": "Gap filling" },
+      { "week": 8, "task": "First fertilizer application" },
+      { "week": 12, "task": "Earthing up" },
+      { "week": 16, "task": "Tillering irrigation" },
+      { "week": 20, "task": "Second fertilizer application" },
+      { "week": 28, "task": "Grand growth phase" },
+      { "week": 36, "task": "Third fertilizer application" },
+      { "week": 52, "task": "Maturity irrigation" },
+      { "week": 78, "task": "Harvest" }
+    ]
+  },
+  "soybean": {
+    "season": "kharif",
+    "duration_days": 85,
+    "schedule": [
+      { "week": 1, "task": "Land preparation" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 3, "task": "Germination irrigation" },
+      { "week": 4, "task": "Weed control" },
+      { "week": 5, "task": "Fertilizer application" },
+      { "week": 7, "task": "Flowering irrigation" },
+      { "week": 9, "task": "Pod development" },
+      { "week": 12, "task": "Harvest" }
+    ]
+  },
+  "groundnut": {
+    "season": "kharif",
+    "duration_days": 105,
+    "schedule": [
+      { "week": 1, "task": "Land preparation and ridging" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 3, "task": "Pegging stage irrigation" },
+      { "week": 4, "task": "Weed control" },
+      { "week": 6, "task": "Fertilizer application" },
+      { "week": 8, "task": "Flower initiation" },
+      { "week": 10, "task": "Pod filling irrigation" },
+      { "week": 15, "task": "Harvest" }
+    ]
+  },
+  "tomato": {
+    "season": "rabi",
+    "duration_days": 120,
+    "schedule": [
+      { "week": 1, "task": "Nursery preparation" },
+      { "week": 2, "task": "Seed sowing in nursery" },
+      { "week": 4, "task": "Transplanting" },
+      { "week": 5, "task": "Establishment irrigation" },
+      { "week": 6, "task": "First fertilizer application" },
+      { "week": 8, "task": "Weed control" },
+      { "week": 10, "task": "Flowering irrigation" },
+      { "week": 12, "task": "Fruit development" },
+      { "week": 16, "task": "Harvest begins" }
+    ]
+  },
+  "potato": {
+    "season": "rabi",
+    "duration_days": 90,
+    "schedule": [
+      { "week": 1, "task": "Land preparation and ridging" },
+      { "week": 2, "task": "Seed treatment and planting" },
+      { "week": 3, "task": "Emergence irrigation" },
+      { "week": 4, "task": "First fertilizer application" },
+      { "week": 6, "task": "Weed control" },
+      { "week": 8, "task": "Tuber initiation irrigation" },
+      { "week": 10, "task": "Second fertilizer application" },
+      { "week": 12, "task": "Tuber bulking" },
+      { "week": 13, "task": "Harvest" }
+    ]
+  },
+  "onion": {
+    "season": "rabi",
+    "duration_days": 120,
+    "schedule": [
+      { "week": 1, "task": "Nursery preparation" },
+      { "week": 2, "task": "Seed sowing" },
+      { "week": 4, "task": "Transplanting" },
+      { "week": 5, "task": "Establishment irrigation" },
+      { "week": 6, "task": "First fertilizer application" },
+      { "week": 8, "task": "Weed control" },
+      { "week": 10, "task": "Bulb development irrigation" },
+      { "week": 12, "task": "Second fertilizer application" },
+      { "week": 16, "task": "Maturity and harvest" }
     ]
   }
 }

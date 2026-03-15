@@ -1,0 +1,137 @@
+Fertilizer Guidelines for Indian Agriculture
+
+Balanced fertilization is essential for sustainable crop production and soil health maintenance.
+
+SOIL TESTING
+- Test soil before every cropping season
+- Parameters: pH, organic carbon, available NPK, micronutrients
+- Use government soil testing labs or private services
+- Soil health card scheme provides recommendations
+
+MACRONUTRIENTS
+
+NITROGEN (N)
+- Essential for vegetative growth and chlorophyll formation
+- Sources: Urea (46% N), Ammonium sulfate (21% N), CAN (25% N)
+- Deficiency symptoms: Yellowing of older leaves, stunted growth
+- Excess: Lodging, delayed maturity, poor quality
+
+PHOSPHORUS (P)
+- Important for root development and energy transfer
+- Sources: DAP (18% N, 46% P2O5), SSP (16% P2O5), Rock phosphate
+- Deficiency: Purple coloration on leaves, poor root growth
+- Applied as basal dose for most crops
+
+POTASSIUM (K)
+- Regulates water balance and disease resistance
+- Sources: MOP (60% K2O), SOP (50% K2O)
+- Deficiency: Scorching of leaf margins, weak stems
+- Important for fruit quality and stress tolerance
+
+FERTILIZER RECOMMENDATIONS BY CROP
+
+RICE
+- N:P:K = 120:60:40 kg/ha
+- Apply 50% N + full P,K basal
+- Remaining N at tillering and panicle initiation
+- Avoid excess N in heavy soils
+
+WHEAT
+- N:P:K = 120:60:40 kg/ha
+- Split N application: 50% basal, 25% at CRI, 25% at jointing
+- Full P,K as basal
+- Zinc sulfate @ 25 kg/ha if deficient
+
+COTTON
+- N:P:K = 120:60:60 kg/ha
+- Apply in 3-4 splits
+- Boron @ 1 kg/ha for boll development
+- Avoid chloride-containing fertilizers
+
+MAIZE
+- N:P:K = 150:75:75 kg/ha
+- Heavy N feeder, apply in splits
+- Zinc and iron often deficient
+- Use chelated micronutrients
+
+SUGARCANE
+- N:P:K = 250:100:250 kg/ha
+- Apply in 5-6 splits throughout growth
+- High K requirement for sugar accumulation
+- Organic manure essential
+
+MICRONUTRIENTS
+
+ZINC (Zn)
+- Most common deficiency in Indian soils
+- Sources: Zinc sulfate, zinc oxide
+- Apply 25 kg/ha as basal or foliar spray
+- Deficiency: White buds, stunted growth
+
+IRON (Fe)
+- Deficiency in alkaline soils
+- Sources: Ferrous sulfate, Fe-EDTA
+- Foliar application more effective
+- Deficiency: Interveinal chlorosis
+
+BORON (B)
+- Important for reproductive development
+- Sources: Borax, solubor
+- Apply 1-2 kg/ha
+- Deficiency: Cracked stems, poor pollination
+
+MANGANESE (Mn)
+- Required in small quantities
+- Sources: Manganese sulfate
+- Deficiency: Grey spots on leaves
+- More common in alkaline soils
+
+FERTILIZER APPLICATION METHODS
+
+BASAL APPLICATION
+- Mix fertilizers with soil before sowing/transplanting
+- Place fertilizers 5-10 cm below and to the side of seeds
+- Avoid direct contact with seeds
+
+TOP DRESSING
+- Apply fertilizers to soil surface after crop establishment
+- Irrigate immediately after application
+- Split applications prevent losses
+
+FOLIAR APPLICATION
+- For micronutrients and quick correction
+- Use 0.5-1% concentration
+- Apply in evening or early morning
+- Effective for Zn, Fe, Mn deficiencies
+
+FERTIGATION
+- Application through irrigation water
+- Requires drip/sprinkler systems
+- Precise nutrient delivery
+- Reduces fertilizer losses
+
+ORGANIC FERTILIZERS
+
+FARMYARD MANURE (FYM)
+- 10-15 tonnes/ha for most crops
+- Improves soil structure and water holding capacity
+- Slow release of nutrients
+- Suppresses soil-borne diseases
+
+VERMICOMPOST
+- 2-3 tonnes/ha
+- Rich in beneficial microbes
+- Better nutrient availability
+- Improves soil aeration
+
+BIOFERTILIZERS
+- Azospirillum for nitrogen fixation
+- Phosphate solubilizing bacteria
+- Zinc solubilizing bacteria
+- Apply as seed treatment or soil application
+
+INTEGRATED NUTRIENT MANAGEMENT
+- Combine chemical fertilizers with organic sources
+- Use biofertilizers for sustainable production
+- Site-specific nutrient management
+- Regular soil testing and monitoring
