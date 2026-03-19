@@ -2,26 +2,33 @@ const axios = require('axios');
 const apiKeys = require('../config/apiKeys');
 
 /**
- * Weather service for Agri Bandhu - Tool interface
+ * Weather service for Agri Bandhu.
+ * Requires an explicit location and a configured API key.
  */
-const getWeather = async (location = "Delhi") => {
-  try {
-    const key = apiKeys.openWeatherKey;
-    if (!key || key === "YOUR_OPENWEATHER_API_KEY_HERE" || key === "dummy_weather_key") {
-      console.log("⚠️ Using mock weather data (API Key missing).");
-      return {
-        city: location,
-        temperature: 32,
-        humidity: 60,
-        rainfall: 0,
-        condition: "Clear sky"
-      };
-    }
+const hasRealWeatherApi = () => {
+  const key = apiKeys.openWeatherKey;
+  return Boolean(
+    key &&
+    key !== 'YOUR_OPENWEATHER_API_KEY_HERE' &&
+    key !== 'dummy_weather_key'
+  );
+};
 
+const getWeather = async (location) => {
+  const city = String(location || '').trim();
+  if (!city) {
+    throw new Error('City is required for weather lookup');
+  }
+
+  if (!hasRealWeatherApi()) {
+    throw new Error('Weather API key is not configured');
+  }
+
+  try {
     const response = await axios.get(apiKeys.openWeatherUrl, {
       params: {
-        q: location,
-        appid: key,
+        q: city,
+        appid: apiKeys.openWeatherKey,
         units: 'metric'
       }
     });
@@ -33,26 +40,17 @@ const getWeather = async (location = "Delhi") => {
       city: data.name,
       temperature: Math.round(data.main.temp),
       humidity: data.main.humidity,
-      rainfall: rainfall,
-      condition: data.weather[0].description
+      rainfall,
+      condition: data.weather[0].description,
+      source: 'api'
     };
   } catch (error) {
-    console.error("OpenWeather API Error:", error.message);
-    // Fallback on error
-    return {
-      city: location,
-      temperature: 32,
-      humidity: 60,
-      rainfall: 0,
-      condition: "Clear sky"
-    };
+    console.error('OpenWeather API Error:', error.message);
+    throw error;
   }
 };
 
 module.exports = {
-  getWeather
-};
-
-module.exports = {
-  getWeather
+  getWeather,
+  hasRealWeatherApi
 };

@@ -22,9 +22,9 @@ router.get('/', (req, res) => {
 
 // ── Incoming Messages ────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
+  let phone = 'default_user';
   try {
     let messageText = '';
-    let phone = 'default_user';
     let imageUrl = null;
 
     // Parse real WhatsApp API payload
@@ -32,6 +32,7 @@ router.post('/', async (req, res) => {
       const entry = req.body.entry?.[0];
       const value = entry?.changes?.[0]?.value;
       const message = value?.messages?.[0];
+      
       if (message?.type === 'text') {
         messageText = message.text.body;
         phone = message.from;
@@ -41,6 +42,7 @@ router.post('/', async (req, res) => {
         messageText = message.caption || "Please check this plant image for diseases.";
         phone = message.from;
       } else if (value?.statuses || !message) {
+        // Ignore status updates and empty messages
         return res.sendStatus(200);
       }
     } else {
@@ -51,44 +53,43 @@ router.post('/', async (req, res) => {
     }
 
     if (!messageText) return res.sendStatus(200);
-    res.sendStatus(200); // Immediately ACK WhatsApp
+
+    // IMMEDIATE ACK to WhatsApp (required for webhook compliance)
+    res.sendStatus(200);
+
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`[📲 WEBHOOK] Received message from ${phone}`);
+    console.log(`[💬 Message]: "${messageText}"`);
+    if (imageUrl) console.log(`[🖼️  Image]: ${imageUrl}`);
 
     // Get conversation context
     const context = sessionMemory.get(phone);
+    console.log(`[📋 Current Context]: ${JSON.stringify(context)}`);
 
-    // Track the crop mentioned by the farmer for follow-up context
-    const cropMention = llmAgent.extractCrop(messageText);
-    if (cropMention && !context.crop) {
-      sessionMemory.update(phone, { crop: cropMention });
-      context.crop = cropMention;
-    }
-
-    // Handle special commands
-    const textStr = messageText.trim().toLowerCase();
-    if (textStr === 'menu') {
-      const menuMsg = `*Agri Bandhu Menu*\n\n🌾 *Ask me anything naturally:*\n\n• Weather in your city\n• Crop planning advice\n• Government schemes\n• Plant disease help\n• Farming tips\n\nJust type your question! 🌱`;
-      await sendWhatsAppMessage(phone, menuMsg);
-      return;
-    }
-
-    // Process message with LLM Agent
-    console.log(`[Webhook] Processing message from ${phone}: "${messageText}"`);
+    // Process message with LLM Agent (single entry point)
     const response = await llmAgent.processMessage(messageText, context, imageUrl);
 
-    // Update context based on response (agent handles this internally)
-    // For now, just store the conversation
+    // Update context after processing (agent updates context internally)
     sessionMemory.addConversation(phone, messageText, response);
+    console.log(`[✅ Response generated]: "${response.substring(0, 100)}..."`);
 
-    console.log(`[Response → ${phone}]: ${response.slice(0, 80)}...`);
+    // SEND SINGLE RESPONSE ONLY
+    console.log(`[📤 Sending WhatsApp message to ${phone}]`);
     await sendWhatsAppMessage(phone, response);
+    console.log(`[✅ Message sent]`);
+    console.log(`${'='.repeat(80)}\n`);
 
   } catch (error) {
-    console.error('Webhook error:', error);
-    // Send error message to user
+    console.error(`[❌ WEBHOOK ERROR]: ${error.message}`);
+    console.error(error.stack);
+    
+    // Send single error message to user
     try {
-      await sendWhatsAppMessage(phone, "क्षमा करें, कुछ तकनीकी समस्या हुई। कृपया कुछ देर बाद फिर से प्रयास करें।");
+      const errorMsg = "खेती के लिए सहायता में कोई समस्या आई। कृपया कुछ समय बाद पुनः प्रयास करें।";
+      console.log(`[📤 Sending error message to ${phone}]`);
+      await sendWhatsAppMessage(phone, errorMsg);
     } catch (e) {
-      console.error('Failed to send error message:', e);
+      console.error(`[❌ Failed to send error message]: ${e.message}`);
     }
   }
 });
