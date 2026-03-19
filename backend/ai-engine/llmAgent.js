@@ -11,10 +11,10 @@ const MODEL = 'openai/gpt-3.5-turbo';
 
 const TOOL_DEFINITIONS = `
 TOOLS AVAILABLE:
-1) WEATHER - needs {"city": "<city name>"}; returns {temperature, humidity, rainfall, condition, city}.
-2) CROP_PLAN - needs {"crop": "<crop name>"}; returns crop schedule with season, duration_days, plan.
-3) SCHEMES - no params; returns an array of scheme objects.
-4) DISEASE - needs {"imageUrl": "<url>"}; returns a disease analysis object.
+1) WEATHER - requires {"city": "<city name>"}.
+2) CROP_PLAN - requires {"crop": "<crop name>"}.
+3) SCHEMES - requires no params.
+4) DISEASE - requires {"imageUrl": "<url>"}.
 `;
 
 class AgriBandhuAgent {
@@ -22,15 +22,18 @@ class AgriBandhuAgent {
     this.systemPrompt = `You are Agri Bandhu, an AI farming assistant for Indian farmers.
 
 LANGUAGE:
-- Always respond in the same language as the farmer's message.
+- Always reply in the same language as the user's message.
 
-CRITICAL RULES:
-1. Use tools for weather, schemes, crop planning, and disease detection.
-2. If required information like city or crop is missing, ask for it.
-3. Never assume or guess a city, crop, or location.
-4. Answer meta questions about APIs, tools, and location directly and honestly.
-5. Be practical, conversational, and farmer-friendly.
-6. Do not mention being an AI unless explicitly asked.
+HONESTY:
+- Never assume or guess a city, crop, location, weather, or tool result.
+- If required information is missing, ask the user for it.
+- If the user challenges an assumption, acknowledge it directly and correct course.
+
+STYLE:
+- Be concise, practical, and conversational.
+- Answer the user's actual question.
+- Do not drift into unrelated farming advice.
+- Do not mention hidden tools or internal reasoning.
 `;
   }
 
@@ -42,15 +45,13 @@ CRITICAL RULES:
       console.log('[AGENT START] Processing message');
       console.log(`[Message]: "${userMessage}"`);
       console.log(`[Context]: ${JSON.stringify(context)}`);
-      if (imageUrl) console.log(`[Image URL]: ${imageUrl}`);
 
       const previousLanguage = context.language;
       const previousAwaitingField = context.awaitingField;
-      const previousLastTopic = context.lastTopic;
       const language = this.detectLanguage(userMessage, previousLanguage);
       context.language = language;
 
-      const crop = this.extractCrop(userMessage);
+      const crop = this.extractCrop(userMessage, context);
       if (crop) {
         context.crop = crop;
         if (context.awaitingField === 'crop') {
@@ -58,7 +59,7 @@ CRITICAL RULES:
         }
       }
 
-      const city = this.extractCity(userMessage);
+      const city = this.extractCity(userMessage, context);
       if (city) {
         context.city = city;
         if (context.awaitingField === 'city') {
@@ -68,24 +69,41 @@ CRITICAL RULES:
 
       const intent = this.detectIntent(userMessage, imageUrl, {
         ...context,
-        previousAwaitingField,
-        previousLastTopic
+        previousAwaitingField
       });
       context.lastTopic = intent !== 'general' ? intent : context.lastTopic;
       console.log(`[Intent]: ${intent}`);
 
-      if (intent === 'meta_api') {
-        return this.answerApiQuestion(language);
+      if (intent === 'greeting') {
+        return await this.generateRedirectResponse(
+          userMessage,
+          context,
+          'The user sent a greeting. Reply with a short greeting and ask how you can help with farming.',
+          { short: true }
+        );
       }
 
-      if (intent === 'meta_location') {
-        return this.answerLocationQuestion(context, language);
+      if (intent === 'meta_correction') {
+        return await this.generateRedirectResponse(
+          userMessage,
+          context,
+          'The user says the assistant assumed something incorrectly. Acknowledge that directly, avoid excuses, and ask what they want to know instead.',
+          { short: true }
+        );
       }
 
-      const missingInfoResponse = this.getMissingInfoResponse(intent, context, language);
-      if (missingInfoResponse) {
-        console.log(`[Missing Info Response]: ${missingInfoResponse}`);
-        return missingInfoResponse;
+      if (intent === 'meta_api' || intent === 'meta_location' || intent === 'meta_location_api') {
+        return await this.generateTransparencyResponse(userMessage, context, intent);
+      }
+
+      if (intent === 'general') {
+        return await this.generateGeneralResponse(userMessage, context);
+      }
+
+      const missingField = this.getMissingField(intent, context, imageUrl);
+      if (missingField) {
+        context.awaitingField = missingField;
+        return await this.generateMissingInfoPrompt(userMessage, context, intent, missingField);
       }
 
       const knowledge = ragRetriever.retrieveKnowledge(userMessage);
@@ -95,21 +113,18 @@ CRITICAL RULES:
       console.log(`[Context Summary]: ${contextSummary}`);
       console.log(`[Tooling]: ${requiresTooling ? 'required' : 'not required'}`);
 
-      const toolRequests = await this.getToolRequests(
-        userMessage,
-        contextSummary,
-        knowledge,
-        imageUrl,
-        requiresTooling,
-        intent,
-        context
-      );
-      console.log(`[Tool Requests]: ${JSON.stringify(toolRequests)}`);
+      const toolRequests = requiresTooling
+        ? await this.getToolRequests(userMessage, contextSummary, knowledge, imageUrl, intent, context)
+        : [];
+      const validatedToolRequests = this.validateToolRequests(toolRequests, intent, context, imageUrl);
+      console.log(`[Validated Tool Requests]: ${JSON.stringify(validatedToolRequests)}`);
 
-      const toolResults = toolRequests.length > 0
-        ? await this.executeToolRequests(toolRequests)
+      const toolResults = validatedToolRequests.length > 0
+        ? await this.executeToolRequests(validatedToolRequests)
         : {};
       console.log(`[Tool Results]: ${JSON.stringify(toolResults, null, 2)}`);
+
+      this.ensureToolResults(intent, toolResults);
 
       const response = await this.getFinalResponse(
         userMessage,
@@ -137,56 +152,46 @@ CRITICAL RULES:
     }
   }
 
-  async getToolRequests(userMessage, contextSummary, knowledge, imageUrl, requiresTooling = false, intent = 'general', context = {}) {
-    const instruction = `
-You are deciding which tools to use. Respond with ONLY valid JSON.
-
-Output format:
-{
-  "reasoning": "<brief explanation>",
-  "toolRequests": [
-    {"name": "<TOOL_NAME>", "params": { ... } }
-  ]
-}
-
-Rules:
-- Weather questions must call WEATHER only when city is available.
-- Crop planning questions must call CROP_PLAN only when crop is available.
-- Scheme questions must call SCHEMES.
-- Image questions must call DISEASE.
-- If required information is missing, return an empty toolRequests array.
-- Never invent a city or default to Delhi, Mumbai, or any other place.
-- Never use tools for meta questions.
-
-${TOOL_DEFINITIONS}
-`;
-
+  async getToolRequests(userMessage, contextSummary, knowledge, imageUrl, intent, context) {
     const prompt = `CONTEXT:
 ${contextSummary}
 
 AGRICULTURAL KNOWLEDGE:
 ${knowledge}
 
-FARMER MESSAGE:
+USER MESSAGE:
 "${userMessage}"
 
 INTENT:
 ${intent}
 
-${requiresTooling ? 'CRITICAL: If information is complete, at least one tool must be called.' : ''}
+Return ONLY valid JSON in this format:
+{
+  "toolRequests": [
+    {"name": "<TOOL_NAME>", "params": { ... } }
+  ]
+}
 
-${instruction}`;
+Rules:
+- WEATHER can be used only if city is already known in context.
+- CROP_PLAN can be used only if crop is already known in context.
+- SCHEMES can be used for government scheme questions.
+- DISEASE can be used only if an imageUrl exists.
+- Never invent missing params.
+- Never return WEATHER without city.
+- Never return CROP_PLAN without crop.
+- If no valid tool call can be made, return {"toolRequests": []}.
+
+Known context:
+- city: ${context.city || 'missing'}
+- crop: ${context.crop || 'missing'}
+- image provided: ${imageUrl ? 'yes' : 'no'}
+
+${TOOL_DEFINITIONS}`;
 
     const llmOutput = await this.callLLM(this.systemPrompt, prompt);
     console.log(`[LLM Tool Response]:\n${llmOutput}`);
-
-    const toolRequests = this.parseToolRequests(llmOutput);
-    if (requiresTooling && toolRequests.length === 0) {
-      console.warn('[ENFORCEMENT] Using heuristic tool routing.');
-      return this.getDefaultToolRequests(intent, context, imageUrl);
-    }
-
-    return toolRequests;
+    return this.parseToolRequests(llmOutput);
   }
 
   parseToolRequests(llmOutput) {
@@ -198,7 +203,7 @@ ${instruction}`;
         return parsed.toolRequests;
       }
     } catch (error) {
-      // Continue to fallback extraction.
+      // Continue to substring extraction.
     }
 
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
@@ -209,14 +214,50 @@ ${instruction}`;
           return parsed.toolRequests;
         }
       } catch (error) {
-        // Ignore invalid extracted JSON.
+        // Ignore invalid JSON.
       }
     }
 
     return [];
   }
 
-  getDefaultToolRequests(intent, context = {}, imageUrl = null) {
+  validateToolRequests(toolRequests, intent, context = {}, imageUrl = null) {
+    const validated = [];
+
+    for (const request of toolRequests) {
+      const name = String(request?.name || '').toUpperCase();
+      const params = request?.params || {};
+
+      if (name === 'WEATHER') {
+        const city = String(params.city || context.city || '').trim();
+        if (!city) continue;
+        validated.push({ name: 'WEATHER', params: { city } });
+        continue;
+      }
+
+      if (name === 'CROP_PLAN') {
+        const crop = String(params.crop || context.crop || '').trim();
+        if (!crop) continue;
+        validated.push({ name: 'CROP_PLAN', params: { crop } });
+        continue;
+      }
+
+      if (name === 'SCHEMES' && intent === 'schemes') {
+        validated.push({ name: 'SCHEMES', params: {} });
+        continue;
+      }
+
+      if (name === 'DISEASE') {
+        const toolImageUrl = String(params.imageUrl || imageUrl || '').trim();
+        if (!toolImageUrl) continue;
+        validated.push({ name: 'DISEASE', params: { imageUrl: toolImageUrl } });
+      }
+    }
+
+    if (validated.length > 0) {
+      return validated;
+    }
+
     if (intent === 'weather' && context.city) {
       return [{ name: 'WEATHER', params: { city: context.city } }];
     }
@@ -248,22 +289,30 @@ ${instruction}`;
     if (/\b(ajj|aaj|kal|barish|mausam|sheher|fasal|kheti|paani|kripya|dobara)\b/i.test(userMessage)) {
       return 'hi';
     }
-    if (previousLanguage) {
-      return previousLanguage;
-    }
-    return 'en';
+    return previousLanguage || 'en';
   }
 
   detectIntent(userMessage, imageUrl = null, context = {}) {
-    const msg = userMessage.toLowerCase();
+    const msg = userMessage.toLowerCase().trim();
+    const extractedCity = this.extractCity(userMessage, context);
+    const extractedCrop = this.extractCrop(userMessage, context);
 
+    if (this.isSimpleGreeting(msg)) {
+      return 'greeting';
+    }
     if (imageUrl || /disease|pest|fungus|infection|leaf spot|blight|keeda|rog|bimari/i.test(msg)) {
       return 'disease';
     }
-    if (/api|tool|real.?time|openweather|backed by weather/i.test(msg)) {
+    if (this.isLocationAndApiQuestion(msg)) {
+      return 'meta_location_api';
+    }
+    if (this.isCorrectionMessage(msg)) {
+      return 'meta_correction';
+    }
+    if (this.isApiQuestion(msg)) {
       return 'meta_api';
     }
-    if (/how did you get my location|how do you know my location|mera location kaise|my location/i.test(msg)) {
+    if (this.isLocationQuestion(msg)) {
       return 'meta_location';
     }
     if (/yojana|scheme|subsid|government|sarkari|loan|benefit/i.test(msg)) {
@@ -275,138 +324,198 @@ ${instruction}`;
     if (/barish|rain|weather|temperature|humid|mausam|garmi|thandi|climate|condition/i.test(msg)) {
       return 'weather';
     }
-    if ((context.awaitingField === 'city' || context.previousAwaitingField === 'city') && this.extractCity(userMessage)) {
+    if ((context.awaitingField === 'city' || context.previousAwaitingField === 'city') && extractedCity) {
       return 'weather';
     }
-    if ((context.awaitingField === 'crop' || context.previousAwaitingField === 'crop') && this.extractCrop(userMessage)) {
-      return 'crop_plan';
-    }
-    if (context.previousLastTopic === 'weather' && this.extractCity(userMessage)) {
-      return 'weather';
-    }
-    if (context.previousLastTopic === 'crop_plan' && this.extractCrop(userMessage)) {
+    if ((context.awaitingField === 'crop' || context.previousAwaitingField === 'crop') && extractedCrop) {
       return 'crop_plan';
     }
     return 'general';
   }
 
-  getMissingInfoResponse(intent, context, language) {
-    if (intent === 'weather' && !context.city) {
-      context.awaitingField = 'city';
-      return this.getAskCityMessage(language);
+  getMissingField(intent, context, imageUrl) {
+    if (intent === 'weather' && !String(context.city || '').trim()) {
+      return 'city';
     }
-
-    if (intent === 'crop_plan' && !context.crop) {
-      context.awaitingField = 'crop';
-      return this.getAskCropMessage(language);
+    if (intent === 'crop_plan' && !String(context.crop || '').trim()) {
+      return 'crop';
     }
-
+    if (intent === 'disease' && !String(imageUrl || '').trim()) {
+      return 'image';
+    }
     return null;
   }
 
-  getAskCityMessage(language) {
-    if (language === 'hi') {
-      return 'Aap kis sheher ke liye weather jaana chahte hain?';
-    }
-    return 'Which city would you like the weather for?';
+  async generateMissingInfoPrompt(userMessage, context, intent, missingField) {
+    const fieldText = missingField === 'city'
+      ? 'city'
+      : missingField === 'crop'
+      ? 'crop'
+      : 'image';
+
+    return this.generateRedirectResponse(
+      userMessage,
+      context,
+      `The user asked about ${intent}, but the required ${fieldText} is missing. Ask for the missing ${fieldText} politely. Keep it short.`,
+      { short: true }
+    );
   }
 
-  getAskCropMessage(language) {
-    if (language === 'hi') {
-      return 'Aap kis fasal ke baare mein pooch rahe hain?';
+  async generateTransparencyResponse(userMessage, context, intent) {
+    const locationFact = context.city
+      ? `Known city from saved context: ${context.city}.`
+      : 'No city is currently known.';
+    const apiFact = hasRealWeatherApi()
+      ? 'Weather API is configured.'
+      : 'Weather API is not configured.';
+
+    let instruction = 'Answer the user honestly and directly.';
+    if (intent === 'meta_api') {
+      instruction = 'The user is asking whether weather data comes from an API. Answer directly and honestly. Do not give a weather forecast.';
+    } else if (intent === 'meta_location') {
+      instruction = 'The user is asking how location was known. Answer directly and honestly. If no city is known, say that clearly and ask them to share their city.';
+    } else if (intent === 'meta_location_api') {
+      instruction = 'The user is asking both about location and API usage. Address both parts directly and honestly. Do not give a weather forecast.';
     }
-    return 'Which crop are you asking about?';
+
+    return this.generateRedirectResponse(
+      userMessage,
+      context,
+      `${instruction}
+
+Facts:
+- ${locationFact}
+- ${apiFact}`,
+      { short: true }
+    );
   }
 
-  answerApiQuestion(language) {
-    const configured = hasRealWeatherApi();
-
-    if (language === 'hi') {
-      return configured
-        ? 'Haan, weather ke liye main real-time weather API ka use karta hoon.'
-        : 'Abhi weather API configured nahi hai, isliye real-time weather response available nahi hai.';
-    }
-
-    return configured
-      ? 'Yes, I use a real-time weather API for weather responses.'
-      : 'The weather API is not configured right now, so real-time weather is not available.';
+  async generateGeneralResponse(userMessage, context) {
+    return this.generateRedirectResponse(
+      userMessage,
+      context,
+      'The user intent is unclear or vague. Ask a short clarifying question about how you can help with farming. Do not give advice yet.',
+      { short: true }
+    );
   }
 
-  answerLocationQuestion(context, language) {
-    if (!context.city) {
-      if (language === 'hi') {
-        return 'Maine aapka location assume nahi kiya hai. Kripya apna sheher batayein.';
-      }
-      return 'I have not assumed your location. Please tell me your city.';
-    }
+  async generateRedirectResponse(userMessage, context, instruction, options = {}) {
+    const contextSummary = this.buildContextSummary(context);
+    const prompt = `USER MESSAGE:
+"${userMessage}"
 
-    if (language === 'hi') {
-      return `Maine aapka location guess nahi kiya. Mujhe ${context.city} aapke message ya saved context se mila tha.`;
-    }
-    return `I did not guess your location. I used ${context.city} from your message or saved conversation context.`;
+CONTEXT:
+${contextSummary}
+
+INSTRUCTION:
+${instruction}
+
+Constraints:
+- Use the same language as the user.
+- Keep the response ${options.short ? 'short' : 'natural and focused'}.
+- Do not assume missing facts.
+- Address the user's actual message directly.`;
+
+    const response = await this.callLLM(this.systemPrompt, prompt);
+    return response.trim();
+  }
+
+  isSimpleGreeting(message) {
+    return /^(hi|hii|hello|hey|namaste|namaskar)$/.test(message);
+  }
+
+  isApiQuestion(message) {
+    return /api|tool|real.?time|openweather|backed by weather/i.test(message);
+  }
+
+  isLocationQuestion(message) {
+    return /how did you get my location|how do you know my location|why do you know my location|i didn't tell you my city|i didnt tell you my city|i did not tell you my city|i didn't tell my city|i didnt tell my city|i did not tell my city|mera location kaise/i.test(message);
+  }
+
+  isLocationAndApiQuestion(message) {
+    return (
+      /didnt tell you my location|did not tell you my location|i didn't tell you my location|i didnt tell you my location|i didn't tell you my city|i didnt tell you my city|i did not tell you my city|i didn't tell my city|i didnt tell my city|i did not tell my city|how did you get my location|how do you know my location|why do you know my location/i.test(message) &&
+      this.isApiQuestion(message)
+    );
+  }
+
+  isCorrectionMessage(message) {
+    return /i didnt ask|i didn't ask|did not ask|why are you telling me this|why are you talking about weather|i never asked|wrong answers|wrong answer|why are you giving wrong answers/i.test(message);
+  }
+
+  looksLikeStandaloneAnswer(message) {
+    return Boolean(message) && !/[?]/.test(message) && message.length <= 60;
   }
 
   async executeToolRequests(toolRequests) {
     const results = {};
 
     for (const request of toolRequests) {
-      try {
-        const name = String(request.name || '').toUpperCase();
-        const params = request.params || {};
+      const name = String(request.name || '').toUpperCase();
+      const params = request.params || {};
 
-        switch (name) {
-          case 'WEATHER': {
-            if (!params.city) {
-              throw new Error('WEATHER tool requires city');
-            }
-            const weather = await getWeather(params.city);
-            if (!weather || !weather.city) {
-              throw new Error('Weather tool returned invalid response');
-            }
-            results.weather = weather;
-            break;
+      switch (name) {
+        case 'WEATHER': {
+          const city = String(params.city || '').trim();
+          if (!city) {
+            throw new Error('WEATHER tool requires city');
           }
-
-          case 'CROP_PLAN': {
-            if (!params.crop) {
-              throw new Error('CROP_PLAN tool requires crop');
-            }
-            const plan = getCropPlan(params.crop);
-            if (!plan || plan.error) {
-              throw new Error(plan?.error || 'Crop plan unavailable');
-            }
-            results.cropPlan = plan;
-            break;
+          const weather = await getWeather(city);
+          if (!weather || !weather.city) {
+            throw new Error('Weather tool returned invalid response');
           }
-
-          case 'SCHEMES':
-            results.schemes = getSchemes();
-            break;
-
-          case 'DISEASE': {
-            if (!params.imageUrl) {
-              throw new Error('DISEASE tool requires imageUrl');
-            }
-            results.disease = await detectDisease(params.imageUrl);
-            break;
-          }
-
-          default:
-            throw new Error(`Unknown tool: ${name}`);
+          results.weather = weather;
+          break;
         }
-      } catch (error) {
-        console.error(`[TOOL ERROR] ${request.name}: ${error.message}`);
-        throw error;
+
+        case 'CROP_PLAN': {
+          const crop = String(params.crop || '').trim();
+          if (!crop) {
+            throw new Error('CROP_PLAN tool requires crop');
+          }
+          const plan = getCropPlan(crop);
+          if (!plan || plan.error) {
+            throw new Error(plan?.error || 'Crop plan unavailable');
+          }
+          results.cropPlan = plan;
+          break;
+        }
+
+        case 'SCHEMES':
+          results.schemes = getSchemes();
+          break;
+
+        case 'DISEASE': {
+          const toolImageUrl = String(params.imageUrl || '').trim();
+          if (!toolImageUrl) {
+            throw new Error('DISEASE tool requires imageUrl');
+          }
+          results.disease = await detectDisease(toolImageUrl);
+          break;
+        }
+
+        default:
+          throw new Error(`Unknown tool: ${name}`);
       }
     }
 
     return results;
   }
 
+  ensureToolResults(intent, toolResults) {
+    if (intent === 'weather' && !toolResults.weather) {
+      throw new Error('Weather flow reached final response without weather tool results');
+    }
+    if (intent === 'crop_plan' && !toolResults.cropPlan) {
+      throw new Error('Crop plan flow reached final response without crop plan results');
+    }
+    if (intent === 'disease' && !toolResults.disease) {
+      throw new Error('Disease flow reached final response without disease tool results');
+    }
+  }
+
   async getFinalResponse(userMessage, contextSummary, knowledge, toolResults, language = 'en') {
-    const languageInstruction = language === 'hi'
-      ? 'Reply in Hindi.'
-      : 'Reply in English.';
+    const languageInstruction = language === 'hi' ? 'Reply in Hindi.' : 'Reply in English.';
 
     const prompt = `CONTEXT:
 ${contextSummary}
@@ -414,7 +523,7 @@ ${contextSummary}
 AGRICULTURAL KNOWLEDGE:
 ${knowledge}
 
-FARMER MESSAGE:
+USER MESSAGE:
 "${userMessage}"
 
 TOOL RESULTS:
@@ -423,10 +532,10 @@ ${JSON.stringify(toolResults, null, 2)}
 Rules:
 1. ${languageInstruction}
 2. Use tool results when available.
-3. Do not mention tools or internal reasoning.
-4. Do not claim a city unless it appears in TOOL RESULTS or CONTEXT.
-5. Be practical and concise.
-`;
+3. Answer only the user's actual question.
+4. Do not pretend to know missing facts.
+5. Do not add unrelated farming advice unless it directly helps answer the question.
+6. Do not claim any location unless it appears in TOOL RESULTS or CONTEXT.`;
 
     const response = await this.callLLM(this.systemPrompt, prompt);
     return response.trim();
@@ -446,8 +555,8 @@ Rules:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage }
         ],
-        temperature: 0.3,
-        max_tokens: 800
+        temperature: 0.2,
+        max_tokens: 500
       },
       {
         headers: {
@@ -475,31 +584,39 @@ Rules:
     return parts.length > 0 ? parts.join(' | ') : 'New conversation';
   }
 
-  extractCity(message) {
-    const cities = [
-      'mumbai', 'pune', 'delhi', 'agra', 'nagpur', 'jaipur', 'lucknow', 'kolkata', 'chennai',
-      'hyderabad', 'surat', 'ahmedabad', 'bhopal', 'indore', 'nashik', 'aurangabad', 'solapur',
-      'varanasi', 'patna', 'gurgaon', 'noida', 'bangalore', 'kochi', 'jamshedpur', 'dilli'
-    ];
-    const messageLower = message.toLowerCase();
+  extractCity(message, context = {}) {
+    const trimmed = String(message || '').trim();
 
-    for (const knownCity of cities) {
-      if (messageLower.includes(knownCity)) {
-        if (knownCity === 'dilli') return 'Delhi';
-        return knownCity.charAt(0).toUpperCase() + knownCity.slice(1);
+    if ((context.awaitingField === 'city' || context.previousAwaitingField === 'city') && this.looksLikeStandaloneAnswer(trimmed)) {
+      return this.toTitleCase(trimmed);
+    }
+
+    const patterns = [
+      /\b(?:in|for|at)\s+([a-zA-Z][a-zA-Z\s-]{1,40})/i,
+      /\b(?:city|location)\s*(?:is|:)?\s*([a-zA-Z][a-zA-Z\s-]{1,40})/i
+    ];
+
+    for (const pattern of patterns) {
+      const match = trimmed.match(pattern);
+      if (match?.[1]) {
+        return this.toTitleCase(match[1].trim());
       }
     }
 
     return null;
   }
 
-  extractCrop(message) {
+  extractCrop(message, context = {}) {
     const crops = [
       'rice', 'wheat', 'cotton', 'maize', 'sugarcane', 'soybean', 'groundnut',
       'tomato', 'potato', 'onion', 'chawal', 'gehu', 'kapas', 'makka',
       'ganna', 'soya', 'moong', 'urad', 'chana'
     ];
-    const messageLower = message.toLowerCase();
+    const messageLower = String(message || '').toLowerCase();
+
+    if ((context.awaitingField === 'crop' || context.previousAwaitingField === 'crop') && this.looksLikeStandaloneAnswer(messageLower)) {
+      return messageLower.trim();
+    }
 
     for (const crop of crops) {
       if (messageLower.includes(crop)) {
@@ -508,6 +625,14 @@ Rules:
     }
 
     return null;
+  }
+
+  toTitleCase(value) {
+    return value
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
   }
 }
 
