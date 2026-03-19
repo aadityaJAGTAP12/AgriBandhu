@@ -1,25 +1,49 @@
 require('dotenv').config();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const llmAgent = require('./backend/ai-engine/llmAgent');
 
-const key = process.env.GEMINI_API_KEY;
-console.log('Key ends with:', key ? key.slice(-6) : 'NOT SET');
+async function testLLMAgent() {
+  console.log('🧪 Testing Agri Bandhu LLM Agent...\n');
 
-const genAI = new GoogleGenerativeAI(key);
+  // Test cases for pure LLM-driven behavior
+  const testCases = [
+    {
+      message: "What's the weather like today?",
+      context: { city: 'Delhi', language: 'en' },
+      description: 'Weather query - should trigger WEATHER tool'
+    },
+    {
+      message: "मेरी गेहूं की फसल के लिए क्या योजना है?",
+      context: { crop: 'wheat', language: 'hi' },
+      description: 'Hindi crop planning query - should trigger CROP_PLAN tool'
+    },
+    {
+      message: "Tell me about government schemes for farmers",
+      context: { language: 'en' },
+      description: 'Scheme query - should trigger SCHEMES tool'
+    },
+    {
+      message: "How do I grow tomatoes better?",
+      context: { language: 'en' },
+      description: 'General farming advice - should use RAG knowledge'
+    }
+  ];
 
-// Try gemini-1.5-flash first, fallback to gemini-pro
-async function test() {
-  for (const modelName of ['gemini-1.5-flash', 'gemini-pro', 'gemini-1.0-pro']) {
+  for (const testCase of testCases) {
     try {
-      console.log(`\nTrying model: ${modelName}`);
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await model.generateContent('Say hello in one word');
-      console.log(`✅ SUCCESS: ${result.response.text()}`);
-      console.log(`\n>>> Use this model: ${modelName}`);
-      break;
-    } catch (err) {
-      console.log(`❌ FAILED: ${err.message}`);
+      console.log(`\n📝 Test: ${testCase.description}`);
+      console.log(`💬 Message: "${testCase.message}"`);
+      console.log(`📍 Context: ${JSON.stringify(testCase.context)}`);
+
+      const response = await llmAgent.processMessage(testCase.message, testCase.context);
+      console.log(`🤖 Response: "${response}"`);
+      console.log('✅ SUCCESS');
+
+    } catch (error) {
+      console.log(`❌ FAILED: ${error.message}`);
     }
   }
+
+  console.log('\n🎉 Testing complete!');
 }
 
-test();
+testLLMAgent().catch(console.error);

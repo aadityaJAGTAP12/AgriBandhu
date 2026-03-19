@@ -56,21 +56,18 @@ router.post('/', async (req, res) => {
     // Get conversation context
     const context = sessionMemory.get(phone);
 
+    // Track the crop mentioned by the farmer for follow-up context
+    const cropMention = llmAgent.extractCrop(messageText);
+    if (cropMention && !context.crop) {
+      sessionMemory.update(phone, { crop: cropMention });
+      context.crop = cropMention;
+    }
+
     // Handle special commands
     const textStr = messageText.trim().toLowerCase();
     if (textStr === 'menu') {
       const menuMsg = `*Agri Bandhu Menu*\n\n🌾 *Ask me anything naturally:*\n\n• Weather in your city\n• Crop planning advice\n• Government schemes\n• Plant disease help\n• Farming tips\n\nJust type your question! 🌱`;
       await sendWhatsAppMessage(phone, menuMsg);
-      return;
-    }
-
-    // First-time onboarding
-    if (!context.onboarded) {
-      context.onboarded = true;
-      sessionMemory.update(phone, { onboarded: true });
-
-      const welcomeMsg = `🌾 *Welcome to Agri Bandhu!*\n\nI am your AI farming assistant. I understand Hindi, Marathi, and English.\n\nJust ask me anything naturally:\n\n_"Pune mai barish hogi?"_\n_"Rice ka crop plan batao"_\n_"Koi sarkari yojana hai?"_\n_"Mere plant pe daag aa gaye hai"_\n\n${textStr === 'menu' ? '' : 'Type *menu* for options.'}`;
-      await sendWhatsAppMessage(phone, welcomeMsg);
       return;
     }
 
